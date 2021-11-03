@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import moment from "moment";
 import {
   FormItem,
@@ -14,7 +14,7 @@ import {
 } from "@formily/antd";
 import { createForm, Field } from "@formily/core";
 import { FormProvider, createSchemaField } from "@formily/react";
-import { ConfigProvider } from "antd";
+import { ConfigProvider, Card, Form, InputNumber } from "antd";
 import locale from "antd/lib/locale/zh_CN";
 const rule = (money: number) => {
   let sum = 0;
@@ -85,11 +85,11 @@ const SchemaField = createSchemaField({
       const diff = moment(end).diff(moment(start), "days");
       const accrual = money * (diff * (rate / cyc / 100 + 0.000175));
       if (backMoney) {
-        field.value = `还本付息之后：${(money + accrual - backMoney).toFixed(
+        field.value = `还本付息之后：${(money + accrual - backMoney)?.toFixed(
           2
         )}`;
       } else {
-        field.value = `${money}(本金)+${accrual}(利息)=${(
+        field.value = `${money}(本金)+${accrual?.toFixed(2)}(利息)=${(
           money + accrual
         ).toFixed(2)}(总额)`;
       }
@@ -99,7 +99,7 @@ const SchemaField = createSchemaField({
       if (!date) {
         return;
       }
-      const [start, end] = date;
+      const [, end] = date;
       field.value = [end, end];
     },
     initMoney: (field: Field) => {
@@ -321,30 +321,18 @@ const schema = {
         },
       },
     },
-    // total: {
-    //   type: 'number',
-    //   title: 'Total',
-    //   'x-decorator': 'FormItem',
-    //   'x-component': 'NumberPicker',
-    //   'x-component-props': {
-    //     addonAfter: '$',
-    //   },
-    //   'x-pattern': 'readPretty',
-    //   'x-reactions': {
-    //     dependencies: ['.projects'],
-    //     when: '{{$deps.length > 0}}',
-    //     fulfill: {
-    //       state: {
-    //         value:
-    //           '{{$deps[0].reduce((total,item)=>item.total ? total+item.total : total,0)}}',
-    //       },
-    //     },
-    //   },
-    // },
   },
 };
 
 const App = () => {
+  const [form1] = Form.useForm();
+  const [count, setCount] = useState(0);
+  const onFinish = (values: any) => {
+    const { co } = values;
+    if (co) {
+      setCount(Number(rule(co)));
+    }
+  };
   return (
     <div>
       <h1 className="title">小可爱的复利计算器</h1>
@@ -352,6 +340,19 @@ const App = () => {
         <FormProvider form={form}>
           <SchemaField schema={schema} />
         </FormProvider>
+        <Card>
+          <Form form={form1} layout="inline" onFinish={onFinish}>
+            <Form.Item name="co" label="计算金额">
+              <InputNumber
+                style={{ width: "200px" }}
+                min={1}
+                onChange={(value) => setCount(Number(rule(value)))}
+              />
+              元
+            </Form.Item>
+            <Form.Item label="律师费用">{count}元</Form.Item>
+          </Form>
+        </Card>
       </ConfigProvider>
     </div>
   );
