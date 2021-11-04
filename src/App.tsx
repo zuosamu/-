@@ -83,7 +83,7 @@ const SchemaField = createSchemaField({
       }
       const [start, end] = date;
       const diff = moment(end).diff(moment(start), "days");
-      const accrual = money * (diff * (rate / cyc / 100 + 0.000175));
+      const accrual = money * (diff * (rate / cyc / 100));
       if (backMoney) {
         field.value = `还本付息之后：${(money + accrual - backMoney)?.toFixed(
           2
@@ -208,7 +208,7 @@ const schema = {
             "x-component": "ArrayTable.Column",
             "x-component-props": {
               title: "借贷的金额(元)(借钱)",
-              width: 150,
+              width: 250,
             },
             properties: {
               money: {
