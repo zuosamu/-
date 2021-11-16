@@ -16,6 +16,7 @@ import { createForm, Field } from "@formily/core";
 import { FormProvider, createSchemaField } from "@formily/react";
 import { ConfigProvider, Card, Form, InputNumber } from "antd";
 import locale from "antd/lib/locale/zh_CN";
+import "moment/locale/zh-cn";
 const rule = (money: number) => {
   let sum = 0;
   if (money > 50000000) {
@@ -302,25 +303,6 @@ const schema = {
                   addonAfter: "￥",
                 },
                 "x-reactions": "{{computeRate}}",
-              },
-            },
-          },
-          column_9: {
-            type: "void",
-            "x-component": "ArrayTable.Column",
-            "x-component-props": {
-              title: "律师费用",
-            },
-            properties: {
-              charge: {
-                type: "string",
-                "x-read-pretty": true,
-                "x-decorator": "FormItem",
-                "x-component": "NumberPicker",
-                "x-component-props": {
-                  addonAfter: "￥",
-                },
-                "x-reactions": "{{initCharge}}",
               },
             },
           },
