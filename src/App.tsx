@@ -188,7 +188,7 @@ const schema = {
             "x-component": "ArrayTable.Column",
             "x-component-props": {
               title: "时间",
-              width: 300,
+              width: 400,
             },
             properties: {
               date: {
@@ -198,6 +198,7 @@ const schema = {
                 "x-component": "DatePicker.RangePicker",
                 "x-component-props": {
                   allowClear: false,
+                  style: { width: "100%" },
                 },
                 "x-reactions": "{{initDate}}",
               },
@@ -216,6 +217,9 @@ const schema = {
                 default: 10000,
                 "x-component": "NumberPicker",
                 "x-reactions": "{{initMoney}}",
+                "x-component-props": {
+                  style: { width: "100%" },
+                },
               },
             },
           },
@@ -231,6 +235,9 @@ const schema = {
                 type: "number",
                 default: 0,
                 "x-component": "NumberPicker",
+                "x-component-props": {
+                  style: { width: "100%" },
+                },
               },
             },
           },
@@ -247,6 +254,9 @@ const schema = {
                 default: 1,
                 "x-component": "NumberPicker",
                 "x-reactions": "{{initRate}}",
+                "x-component-props": {
+                  style: { width: "100%" },
+                },
               },
             },
           },
@@ -262,6 +272,9 @@ const schema = {
                 type: "number",
                 "x-component": "Select",
                 default: 30,
+                "x-component-props": {
+                  style: { width: "100%" },
+                },
                 enum: [
                   { label: "日利率", value: 1 },
                   { label: "周利率", value: 7 },
