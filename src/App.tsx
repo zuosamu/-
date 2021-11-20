@@ -14,9 +14,22 @@ import {
 } from "@formily/antd";
 import { createForm, Field } from "@formily/core";
 import { FormProvider, createSchemaField } from "@formily/react";
-import { ConfigProvider, Card, Form, InputNumber } from "antd";
+import {
+  ConfigProvider,
+  Card,
+  Form,
+  InputNumber,
+  Button,
+  Modal,
+  notification,
+  Dropdown,
+  Menu,
+} from "antd";
 import locale from "antd/lib/locale/zh_CN";
 import "moment/locale/zh-cn";
+import useLocalStorage from "./useLocalStorage";
+import "./App.css";
+
 const rule = (money: number) => {
   let sum = 0;
   if (money > 50000000) {
@@ -143,7 +156,7 @@ const SchemaField = createSchemaField({
 });
 
 const form = createForm();
-
+const saveForm = createForm();
 const schema = {
   type: "object",
   properties: {
@@ -318,10 +331,64 @@ const schema = {
     },
   },
 };
+interface SaveObj {
+  id: number;
+  name?: string;
+}
 
 const App = () => {
   const [form1] = Form.useForm();
   const [count, setCount] = useState(0);
+  const [store, setStore] = useLocalStorage("xiaokeai", []);
+  const saveInLocalStorage = (obj: SaveObj, active: string) => {
+    if (!window.localStorage) {
+      notification.error({
+        message: "保存失败！",
+        description: "原因本地获取localStorage失败",
+      });
+      return;
+    }
+    if (active === "add") {
+      setStore([obj, ...store]);
+      notification.success({
+        message: "保存成功！",
+        description: "您可厉害了",
+      });
+    } else if (active === "remove") {
+      setStore(store.filter(({ id }: SaveObj) => obj?.id !== id));
+      notification.warn({
+        message: "移除成功！",
+        description: "牛牛牛",
+      });
+    }
+  };
+  const modal = {
+    title: "小可爱，这里输入保存时的名字",
+    content: (
+      <FormProvider form={saveForm}>
+        <SchemaField>
+          <SchemaField.String
+            name="name"
+            x-decorator="FormItem"
+            x-component="Input"
+            required
+          />
+        </SchemaField>
+      </FormProvider>
+    ),
+    okText: "确认",
+    cancelText: "取消",
+    onOk: async () => {
+      const saveFormValue: object = await saveForm.submit();
+      const formValue: object = await form.submit();
+      console.log({ ...formValue, id: Date.now(), ...saveFormValue });
+      saveInLocalStorage(
+        { ...formValue, id: Date.now(), ...saveFormValue },
+        "add"
+      );
+      return Promise.resolve();
+    },
+  };
   const onFinish = (values: any) => {
     const { co } = values;
     if (co) {
@@ -348,6 +415,41 @@ const App = () => {
             <Form.Item label="律师费用">{count}元</Form.Item>
           </Form>
         </Card>
+        <div className="save-wrap">
+          <Button
+            style={{ marginRight: "10px" }}
+            type="primary"
+            size="large"
+            danger
+            onClick={() => Modal.confirm(modal)}
+          >
+            保存
+          </Button>
+          <div className="save-list">
+            {store.map((i: any) => {
+              return (
+                <Dropdown.Button
+                  size="small"
+                  type="primary"
+                  overlay={
+                    <Menu
+                      onClick={(e) => {
+                        saveInLocalStorage(i, e.key);
+                      }}
+                    >
+                      <Menu.Item key="remove">移除</Menu.Item>
+                    </Menu>
+                  }
+                  onClick={() => {
+                    form.setValues(i);
+                  }}
+                >
+                  {i.name}
+                </Dropdown.Button>
+              );
+            })}
+          </div>
+        </div>
       </ConfigProvider>
     </div>
   );
